@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "flow.js@2.14.1",
+      "destination": "wwwroot/lib/flow.js/"
+    },
+    {
+      "library": "flowbite@2.5.2",
+      "destination": "wwwroot/lib/flowbite/"
+    }
+  ]
+}

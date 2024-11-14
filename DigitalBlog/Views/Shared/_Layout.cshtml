@@ -14,8 +14,11 @@
     <link rel="stylesheet" href="~/DigitalBlog.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="fixed bg-gray-600 top-0 z-50 w-full border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+   
+        <header>
+        @if (User.Identity!.IsAuthenticated)
+        {
+            <nav class="fixed bg-gray-600 top-0 z-50 w-full border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <div class="px-3 py-3 bg-gray-600 lg:px-5 lg:pl-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center justify-start rtl:justify-end">
@@ -92,11 +95,16 @@
                     
                 </ul>
             </div>
-        </aside>
+            </aside>
 
-        
-
+        }
+        else
+        {
+           <div>Hello</div>    
+        }
     </header>
+   
+
     <div class="p-4 sm:ml-64" style="margin-top:50px">
         <main role="main" class="pb-3">
             @RenderBody()

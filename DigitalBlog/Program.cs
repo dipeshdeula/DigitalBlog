@@ -1,3 +1,6 @@
+using DigitalBlog.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace DigitalBlog
 {
     public class Program
@@ -8,7 +11,8 @@ namespace DigitalBlog
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+            builder.Services.AddDbContext<DigitalBlogContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -24,6 +28,7 @@ namespace DigitalBlog
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

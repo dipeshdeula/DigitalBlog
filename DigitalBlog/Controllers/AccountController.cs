@@ -14,7 +14,7 @@ namespace DigitalBlog.Controllers
         private readonly DigitalBlogContext _context;
         private readonly IDataProtector _protector;
 
-        public AccountController(DigitalBlogContext context,IDataProtectionProvider provider , DataSecurityKey key)
+        public AccountController(DigitalBlogContext context, IDataProtectionProvider provider, DataSecurityKey key)
         {
             _context = context;
             _protector = provider.CreateProtector(key.Datakey);
@@ -45,10 +45,10 @@ namespace DigitalBlog.Controllers
                 {
                     List<Claim> claims = new()
                     {
-
+                        new Claim(ClaimTypes.Name,user.UserId.ToString()),
                         new Claim(ClaimTypes.Name, user.LoginName),
-                        new Claim(ClaimTypes.Email, user.EmailAddress),
                         new Claim(ClaimTypes.Role, user.UserRole),
+                         new Claim("Email", user.EmailAddress),
                         new Claim("FullName", user.FullName),
                     };
 
@@ -68,13 +68,34 @@ namespace DigitalBlog.Controllers
                 ModelState.AddModelError("", "this user doesn't exist");
                 return View(edit);
             }
-           
+
         }
 
         [Authorize]
         public IActionResult Dashboard()
         {
-            return Json("Hello Dashboard");
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index","Home");
+
+            }
+            else if (User.IsInRole("Editor"))
+            {
+                return RedirectToAction("Index","Home");
+
+            }
+            else
+            {
+                return RedirectToAction("Privacy","Home");
+            }
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Static");
+        
         }
     }
 }

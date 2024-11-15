@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalBlog.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,23 +22,26 @@ namespace DigitalBlog.Controllers
             _context = context;
         }
 
-        [Authorize]
+        [Authorize(Roles ="Admin,Editor")]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles ="User")]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult AddUser()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public IActionResult AddUser(UserListEdit edit)
         {
@@ -81,7 +85,7 @@ namespace DigitalBlog.Controllers
                 };
                 _context.UserLists.Add(u);
                 _context.SaveChanges();
-                return Json(u);
+                return RedirectToAction("Login", "Account");
             }
             catch (Exception ex)
             {
@@ -90,7 +94,21 @@ namespace DigitalBlog.Controllers
 
             }
         }
+       
+        [HttpGet]
+        public IActionResult ProfileImg()
+        {
+            //var user = _context.UserLists.Where(u => u.LoginName == Convert.ToString(User.Identity!.Name)).FirstOrDefault();
+            var user = _context.UserLists.Where(u => u.UserId == Convert.ToInt16(User.Identity!.Name)).FirstOrDefault();
+            ViewData["img"] = user!.UserProfile;
+            return PartialView("_ProfileImg",user);
+        
+        }
 
+        public IActionResult ProfileUpdate()
+        {
+            return View();
+        }
   }
 
 }

@@ -1,4 +1,6 @@
-﻿namespace DigitalBlog.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DigitalBlog.Models
 {
     public class UserListEdit
     {
@@ -6,6 +8,7 @@
 
         public string LoginName { get; set; } = null!;
 
+        [DataType(DataType.Password)]
         public string LoginPassword { get; set; } = null!;
 
         public string UserProfile { get; set; } = null!;
@@ -20,5 +23,9 @@
 
         public string? Phone { get; set; }
 
+        public bool RememberMe { get; set; } = false;
+
+        [DataType(DataType.Upload)]
+        public IFormFile? UserFile { get; set; }
     }
 }

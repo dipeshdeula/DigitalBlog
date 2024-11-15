@@ -1,4 +1,6 @@
 using DigitalBlog.Models;
+using DigitalBlog.Security;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitalBlog
@@ -11,8 +13,23 @@ namespace DigitalBlog
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            //Datasecurity dependency
+            builder.Services.AddSingleton<DataSecurityKey>();
+
+            //Database dependency
             builder.Services.AddDbContext<DigitalBlogContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            //Authentication dependency
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+
+                options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                });
+           
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

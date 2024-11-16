@@ -1,6 +1,7 @@
 using DigitalBlog.Models;
 using DigitalBlog.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitalBlog
@@ -29,7 +30,17 @@ namespace DigitalBlog
                     options.LoginPath = "/Account/Login";
                     options.AccessDeniedPath = "/Account/AccessDenied";
                 });
-           
+
+            // Configure data protection
+            builder.Services.AddDataProtection()
+      .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "Security")))
+      .SetApplicationName("DigitalBlog");
+
+            builder.Services.AddSession(o =>
+            {
+                o.IdleTimeout = TimeSpan.FromMinutes(2);
+                o.Cookie.HttpOnly = true;
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -42,6 +53,7 @@ namespace DigitalBlog
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
 
             app.UseRouting();
 

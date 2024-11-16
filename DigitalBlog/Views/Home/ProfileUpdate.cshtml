@@ -1,1 +1,76 @@
-﻿
+﻿@model UserListEdit
+
+@{
+    ViewData["title"] = "Profile";
+}
+<div class="bg-blue-500 py-3 px-5 text-white mb-2">
+    <h1>Profile Update</h1>
+
+</div>
+<div class="grid grid-cols-2 gap-2">
+
+    <div class="w-full p-5 max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800">
+        <div class="flex flex-col items-center pb-10">
+            <img class="w-24 mb-3 rounded-full shadow-lg" src="~/UserProfile/@Model.UserProfile" />
+            <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">@Model.FullName</h5>
+            <span class="text-sm text-gray-500 dark:text-gray-400">@Model.EmailAddress</span>
+
+        </div>
+    </div>
+
+    <form asp-action="ProfileUpdate" enctype="multipart/form-data">
+        <div asp-validation-summary="All"></div>
+        <div>
+            <input asp-for="UserId" hidden />
+            <input asp-for="LoginPassword" hidden />
+            <input asp-for="LoginStatus" hidden style="display:none"/>
+            <input asp-for="UserProfile" hidden />
+            <input asp-for="UserRole" hidden />
+
+        </div>
+        <div class="relative mb-3">
+            <label asp-for="LoginName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+            <input asp-for="LoginName" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="deuladipesh@gmail.com" required="" />
+
+            <span asp-validation-for="LoginName" class="text-red-800"></span>
+        </div>
+
+        <div class="relative mb-3 hidden">
+            <label asp-for="LoginPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+            <input asp-for="LoginPassword" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="*******" required="" />
+            <span asp-validation-for="LoginPassword" class="text-red-800"></span>
+        </div>
+
+
+        <div class="relative mb-3">
+            <label asp-for="FullName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+            <input asp-for="FullName" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="deuladipesh@gmail.com" required="" />
+
+            <span asp-validation-for="FullName" class="text-red-800"></span>
+        </div>
+
+        <div class="relative mb-3">
+            <label asp-for="EmailAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+            <input asp-for="EmailAddress" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="*******" required="" />
+            <span asp-validation-for="EmailAddress" class="text-red-800"></span>
+        </div>
+
+        <div class="relative mb-3">
+            <label asp-for="UserFile" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+            <input asp-for="UserFile" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="deuladipesh@gmail.com" required="" />
+
+            <span asp-validation-for="UserFile" class="text-red-800"></span>
+        </div>
+
+        <div class="relative mb-3">
+            <label asp-for="Phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+            <input asp-for="Phone" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="*******" required="" />
+            <span asp-validation-for="Phone" class="text-red-800"></span>
+        </div>
+
+        <div class="my-3">
+            <input type="submit" value="Update" class="w-full text-white bg-blue-500 hover\:bg-blue-700 py-3 px-5 rounded-lg" />
+        </div>
+    </form>
+
+</div>

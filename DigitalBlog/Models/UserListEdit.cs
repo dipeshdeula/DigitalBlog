@@ -27,5 +27,7 @@ namespace DigitalBlog.Models
 
         [DataType(DataType.Upload)]
         public IFormFile? UserFile { get; set; }
+
+        public int Otp { get; set; }
     }
 }

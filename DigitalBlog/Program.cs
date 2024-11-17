@@ -19,22 +19,20 @@ namespace DigitalBlog
             builder.Services.AddSingleton<DataSecurityKey>();
 
             //Database dependency
-            builder.Services.AddDbContext<DigitalBlogContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<DigitalBlogContext>(opt =>
+                opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             //Authentication dependency
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
 
-                options =>
-                {
-                    options.LoginPath = "/Account/Login";
-                    options.AccessDeniedPath = "/Account/AccessDenied";
-                });
+                options => options.LoginPath = "/Account/Login"
+                   // options.AccessDeniedPath = "/Account/AccessDenied";
+                );
 
             // Configure data protection
             builder.Services.AddDataProtection()
-      .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "Security")))
-      .SetApplicationName("DigitalBlog");
+              .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "Security")))
+              .SetApplicationName("DigitalBlog");
 
             builder.Services.AddSession(o =>
             {

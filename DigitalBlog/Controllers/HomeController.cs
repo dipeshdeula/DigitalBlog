@@ -18,7 +18,7 @@ namespace DigitalBlog.Controllers
         public HomeController(ILogger<HomeController> logger, DataSecurityKey key, IDataProtectionProvider provider, IWebHostEnvironment env, DigitalBlogContext context)
         {
             _logger = logger;
-            _protector = provider.CreateProtector(key.Datakey);
+            _protector = provider.CreateProtector(key.DataKey);
             _env = env;
             _context = context;
         }
@@ -86,15 +86,15 @@ namespace DigitalBlog.Controllers
 
                 };
 
-               // return Json(u);
+                //return Json(u);
                 _context.UserLists.Add(u);
                 _context.SaveChanges();
                 return RedirectToAction("Login", "Account");
             }
             catch (Exception ex)
             {
-                //return View(edit);
-                return Json(ex.Message);
+                return View(edit);
+               // return Json(ex.Message);
 
 
             }
@@ -123,7 +123,8 @@ namespace DigitalBlog.Controllers
                 {
                     UserId = user.UserId,
                     LoginName = user.LoginName,
-                    LoginPassword = _protector.Protect(user.LoginPassword),
+                   // LoginPassword = _protector.Protect(user.LoginPassword),
+                   LoginPassword = user.LoginPassword,
                     EmailAddress = user.EmailAddress,
                     FullName = user.FullName,
                     Phone = user.Phone,

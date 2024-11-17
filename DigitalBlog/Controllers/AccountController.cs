@@ -14,13 +14,15 @@ namespace DigitalBlog.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly ILogger<AccountController> _logger;
         private readonly DigitalBlogContext _context;
         private readonly IDataProtector _protector;
 
-        public AccountController(DigitalBlogContext context,  DataSecurityKey key, IDataProtectionProvider provider)
+        public AccountController(ILogger<AccountController> logger, DigitalBlogContext context,  DataSecurityKey key, IDataProtectionProvider provider)
         {
+            _logger = logger;
             _context = context;
-            _protector = provider.CreateProtector(key.Datakey);
+            _protector = provider.CreateProtector(key.DataKey);
         }
 
         [HttpGet]
@@ -43,11 +45,11 @@ namespace DigitalBlog.Controllers
             if (u != null)
             {
 
-                /*var user = u.Where(e => (e.LoginName.ToUpper().Equals
+               /* var user = u.Where(e => (e.LoginName.ToUpper().Equals
                 (edit.LoginName.ToUpper()) || e.EmailAddress.ToUpper().Equals(edit.EmailAddress.ToUpper()))
                     && _protector.Unprotect(e.LoginPassword).Equals(edit.LoginPassword) && e.LoginStatus == true).FirstOrDefault();*/
 
-                var user = u.Where(e=>e.LoginName.Equals(edit.LoginName) && e.LoginPassword.Equals(edit.LoginPassword) && e.LoginStatus == true).FirstOrDefault();
+               var user = u.Where(e=>e.LoginName.Equals(edit.LoginName) && _protector.Unprotect(e.LoginPassword).Equals(edit.LoginPassword) && e.LoginStatus == true).FirstOrDefault();
 
 
 
@@ -56,7 +58,7 @@ namespace DigitalBlog.Controllers
                     List<Claim> claims = new()
                     {
                         new Claim(ClaimTypes.Name,user.UserId.ToString()),
-                        new Claim(ClaimTypes.Name, user.LoginName),
+                        /*new Claim(ClaimTypes.Name, user.LoginName),*/
                         new Claim(ClaimTypes.Role, user.UserRole),
                          new Claim("Email", user.EmailAddress),
                         new Claim("FullName", user.FullName),
@@ -194,8 +196,8 @@ namespace DigitalBlog.Controllers
 
                     Host = "smtp.gmail.com",
                     Port = 587,
-                    UseDefaultCredentials=false,
-                    Credentials = new NetworkCredential("deuladipesh94@gmail.com", "Dipesh@123"),
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("deuladipesh94@gmail.com", "yugt ynov piuo psnx"), //gmail_id, app Password
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network
                 };
@@ -204,7 +206,7 @@ namespace DigitalBlog.Controllers
                 {
                     From = new MailAddress("deuladipesh94@gmail.com"),
                     Subject = "forgot password",
-                    Body = $"<a style='background-color:blue; color:white; padding:5px;' href='https://localhost:7299/Account/ResetPassword/{_protector.Protect(otp)}'>Reset Password</a>" +
+                    Body = $"<a style='background-color:blue; color:white; padding:5px;' href='https://localhost:7299/Account/ResetPassword/{_protector.Protect(otp!)}'>Reset Password</a>" +
                     $"<p>otp:{otp}</p>",
 
                     IsBodyHtml = true,
@@ -213,12 +215,21 @@ namespace DigitalBlog.Controllers
                 smtpClient.Send(mailMessage);
                 return RedirectToAction("verifyOtp");
             }
-            catch (Exception ex)
-            
+            catch (SmtpException smtpEx)
+
             {
-                return View(ex);
-            
-                
+                ModelState.AddModelError("", "There was an error sending the Email. Please try again later.");
+                _logger.LogError(smtpEx, "SMTP error in ForgotPassword");
+                return View(edit);
+
+
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An unexpected error occurred. Please try again later.");
+                _logger.LogError(ex, "Error in ForgotPassword");
+                return View(edit);
+
             }
            
         }

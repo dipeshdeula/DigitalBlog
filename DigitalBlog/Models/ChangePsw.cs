@@ -20,5 +20,7 @@ namespace DigitalBlog.Models
         [Display(Name = "Confirm Password")]
         [Compare("NewPassword", ErrorMessage = "Confirm Password Does not match")]
         public string ConfirmPassword { get; set; } = null!;
+
+        public int UserId { get; set; }
     }
 }

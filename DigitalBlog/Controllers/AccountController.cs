@@ -189,6 +189,7 @@ namespace DigitalBlog.Controllers
 
                 Random r = new Random();
                 HttpContext.Session.SetString("otp", r.Next(100000, 999999).ToString());
+                HttpContext.Session.SetString("id", _protector.Protect(user.UserId.ToString()));
                 var otp = HttpContext.Session.GetString("otp");
 
                 SmtpClient smtpClient = new()
@@ -241,6 +242,89 @@ namespace DigitalBlog.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult VerifyOtp(UserListEdit edit)
+        {
+            try
+            {
+                var otp = HttpContext.Session.GetString("otp");
+                int o= Convert.ToInt32(otp);
+                if (edit.Otp == o)
+                {
+                   
+                   return RedirectToAction("ResetPassword", new { id = _protector.Protect(otp!) });
+                }
+                else {
+                    return View(edit);
+                }
+
+            }
+            catch 
+            {
+                return View();
+            
+            }
+            
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string id)
+        {
+            try
+            {
+                var otp = _protector.Unprotect(id);
+                var o = HttpContext.Session.GetString("otp");
+
+                if (o == otp)
+                {
+                    var uid = HttpContext.Session.GetString("id");
+                    if (uid == null)
+                    {
+
+                        return Json("null Id");
+                    }
+
+                    int userid = Convert.ToInt32(_protector.Unprotect(uid));
+                    ChangePsw p = new() { UserId = userid };
+                    return View(p);
+
+                }
+                else
+                {
+                    return RedirectToAction("ForgotPassword");
+
+                }
+
+            }
+            catch
+            {
+                return RedirectToAction("ForgotPassword");
+
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult ResetPassword(ChangePsw p)
+        {
+            var user = _context.UserLists.Where(u => u.UserId == p.UserId).FirstOrDefault();
+            if (user == null)
+            {
+                return Json("null");
+            }
+
+            if (p.NewPassword == p.ConfirmPassword)
+            {
+                user.LoginPassword = _protector.Protect(p.NewPassword);
+                _context.Update(user);
+                return RedirectToAction("Login", "Account");
+            }
+
+            else {
+                ModelState.AddModelError("", "Confirm Password");
+                return View(p);
+            }
+        }
 
     }
 }

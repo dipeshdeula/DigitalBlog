@@ -1,0 +1,58 @@
+﻿@model List<BlogEdit>
+
+<div class="flex flex-wrap gap-2">
+    @foreach (var item in Model)
+    {
+        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="#">
+                <img class="rounded-t-lg" src="~/Images/Blogs/@item.BlogImage" alt="" />
+            </a>
+            <div class="p-5">
+                <a href="#">
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">@item.Title</h5>
+                </a>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                    @(
+                        (item.Bdescription.Length >= 30) 
+                        ? item.Bdescription.Substring(0, 30) + "...."
+                        : item.Bdescription
+                    )
+                        
+                    </p>
+                <div class="flex flex-wrap gap-2">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Bid" asp-controller="Blog" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Bid" asp-controller="Blog" data-ajax="true" data-ajax-method="get" data-ajax-confirm="Are you sure you want tp delete This?" data-ajax-complete="DeletedComplete" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            Delete
+                        </a>
+                    }
+
+                    @if (item.Bstatus =="Paid")
+                    {
+                        var netAmt = item.Amount;
+                        var id = item.BlogEncId;
+                        <form action="https://uat.esewa.com.np/epay/main" method="POST">
+                            <input value="@netAmt" name="tAmt" type="hidden">
+                            <input value="@netAmt" name="amt" type="hidden">
+                            <input value="0" name="txAmt" type="hidden">
+                            <input value="0" name="psc" type="hidden">
+                            <input value="0" name="pdc" type="hidden">
+                            <input value="EPAYTEST" name="scd" type="hidden">
+                            <input value="@id" name="pid" type="hidden">
+                            <input value="https://localhost:7299/Blog/Success?q=su" type="hidden" name="su">
+                            <input value="https://localhost:7299/Blog/Failure?q=fu" type="hidden" name="fu">
+                            <input value="e-Sewa" class="bg-green-600 hover:bg-green-800 px-3 py-3  m-1" type="submit">
+                        </form>
+                    }
+                    <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        View
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    }
+</div>

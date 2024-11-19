@@ -23,5 +23,7 @@ namespace DigitalBlog.Models
         public decimal Amount { get; set; }
 
         public string PublishedBy { get; set; } = null!;
+
+        public string BlogEncId { get; set; } = null!;
     }
 }

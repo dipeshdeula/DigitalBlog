@@ -4,18 +4,21 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace DigitalBlog.Controllers
 {
     public class BlogController : Controller
     {
+        private readonly HttpClient _httpClient;
         private readonly ILogger<BlogController> _logger;
         private readonly DigitalBlogContext _context;
         private readonly IDataProtector _protector;
         private readonly IWebHostEnvironment _env;
 
-        public BlogController(ILogger<BlogController> logger,DigitalBlogContext context,DataSecurityKey key, IDataProtectionProvider provider, IWebHostEnvironment env)
+        public BlogController(HttpClient httpClient ,ILogger<BlogController> logger,DigitalBlogContext context,DataSecurityKey key, IDataProtectionProvider provider, IWebHostEnvironment env)
         {
+            _httpClient = httpClient;
             _logger = logger;
             _context = context;
             _protector = provider.CreateProtector(key.DataKey);
@@ -29,11 +32,62 @@ namespace DigitalBlog.Controllers
             
             return View();
         }
+
+        /*public async Task<List<IActionResult>> GetBlogList()
+        {
+            return await _httpClient.MaxResponseContentBufferSize.ReadFromJsonAsync<IEnumerable<Blog>>();
+        }*/
+        /*
+                [HttpGet]
+                public async Task<IActionResult> GetBlogList(BlogEdit edit)
+                {
+
+                    var blogList = await _context.Blogs.Include(u=>u.User).Where(b=>b.Bstatus==edit.Bstatus).ToListAsync();
+
+                    //var blogList = await _context.Blogs.Include(u => u.User).ToListAsync();
+
+                    var bgList = blogList.Select(e => new BlogEdit
+                    {
+                        Bid = e.Bid,
+                        Title = e.Title,
+                        Bdescription = e.Bdescription,
+                        BlogImage = e.BlogImage,
+                        BlogPostDate = e.BlogPostDate,
+                        UserId = e.UserId,
+                        Bstatus = e.Bstatus,
+                        Amount = e.Amount,
+                        PublishedBy = e.User.FullName,
+                        BlogEncId = _protector.Protect(e.Bid.ToString())
+
+
+                    }).ToList();
+                    return Json(bgList);
+                    return PartialView("_GetBlogList",bgList);
+                }*/
+
         [HttpGet]
         public async Task<IActionResult> GetBlogList(BlogEdit edit)
         {
-          
-            var blogList = await _context.Blogs.Include(u=>u.User).Where(b=>b.Bstatus==edit.Bstatus).ToListAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.LogWarning("User is not logged in.");
+                return Json(new List<BlogEdit>());
+            }
+
+            if (string.IsNullOrEmpty(edit.Bstatus))
+            {
+                _logger.LogWarning("Bstatus is null or empty.");
+                return Json(new List<BlogEdit>());
+            }
+
+            var blogList = await _context.Blogs
+                                         .Include(b => b.User)
+                                         .Include(b => b.BlogSubscriptions)
+                                         .Where(b => b.Bstatus == edit.Bstatus && b.BlogSubscriptions.Any(bs => bs.UserId == int.Parse(userId)))
+                                         .ToListAsync();
+
+            _logger.LogInformation($"Fetched {blogList.Count} blogs with status {edit.Bstatus} for user {userId}");
 
             var bgList = blogList.Select(e => new BlogEdit
             {
@@ -47,12 +101,11 @@ namespace DigitalBlog.Controllers
                 Amount = e.Amount,
                 PublishedBy = e.User.FullName,
                 BlogEncId = _protector.Protect(e.Bid.ToString())
-
-
             }).ToList();
+
             return Json(bgList);
-           // return PartialView("_GetBlogList",bgList);
         }
+
         [Authorize(Roles ="Admin,Editor")]
         [HttpGet]
         public IActionResult AddBlog()

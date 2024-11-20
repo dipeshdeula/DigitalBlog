@@ -8,6 +8,7 @@ namespace DigitalBlog
 {
     public class Program
     {
+
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -28,12 +29,11 @@ namespace DigitalBlog
                 options => options.LoginPath = "/Account/Login"
                    // options.AccessDeniedPath = "/Account/AccessDenied";
                 );
-
             // Configure data protection
             builder.Services.AddDataProtection()
               .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "Security")))
               .SetApplicationName("DigitalBlog");
-
+            builder.Services.AddTransient<HttpClient>();
             builder.Services.AddSession(o =>
             {
                 o.IdleTimeout = TimeSpan.FromMinutes(2);
